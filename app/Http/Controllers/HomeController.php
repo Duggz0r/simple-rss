@@ -31,13 +31,11 @@ class HomeController
 
         try {
             $data = simplexml_load_string($data);
-        }
-
-        catch(\Exception $e) {
+        } catch (\Exception $e) {
             return redirect()->route('welcome')->with('error', 'URL is not a valid RSS Feed');
         }
 
-        if(empty($checkDB)) {
+        if (empty($checkDB)) {
             $this->add($url);
         }
 
@@ -45,20 +43,20 @@ class HomeController
 
         $articles = array();
 
-        if($data->channel->item) {
+        if ($data->channel->item) {
             foreach ($data->channel->item as $item) {
                 $articles[] = array(
-                    'title'         => (string)$item->title,
-                    'description'   => (string)$item->description,
-                    'link'          => (string)$item->link,
+                    'title' => (string)$item->title,
+                    'description' => (string)$item->description,
+                    'link' => (string)$item->link,
                 );
             }
-        } elseif($data->item) {
+        } elseif ($data->item) {
             foreach ($data->item as $item) {
                 $articles[] = array(
-                    'title'         => (string)$item->title,
-                    'description'   => (string)$item->description,
-                    'link'          => (string)$item->link,
+                    'title' => (string)$item->title,
+                    'description' => (string)$item->description,
+                    'link' => (string)$item->link,
                 );
             }
         }
@@ -72,10 +70,8 @@ class HomeController
 
         try {
             $data = simplexml_load_string($data);
-        }
-
-        catch(\Exception $e) {
-            return redirect()->back()->with('error', 'URL is not a valid RSS Feed');
+        } catch (\Exception $e) {
+            return redirect()->route('welcome')->with('error', 'URL is not a valid RSS Feed');
         }
 
         $feed = new Feeds();
@@ -89,7 +85,7 @@ class HomeController
     {
         $feed = Feeds::where('id', $id)->first();
 
-        if($feed) {
+        if ($feed) {
             $feed->delete();
 
             return redirect()->route('welcome')->with('success', 'URL deleted');
@@ -102,23 +98,35 @@ class HomeController
     {
         $success = false;
 
-        if(request()->post()) {
-            foreach(request()->post() as $key=>$post) {
-                if($key != '_token') {
+        $errorURLs = [];
+
+        if (request()->post()) {
+            foreach (request()->post() as $key => $post) {
+                if ($key != '_token') {
                     $feed = Feeds::where('id', $key)->first();
 
-                    if($feed->url != $post) {
+                    if ($feed->url != $post) {
+                        $data = file_get_contents($post);
+
+                        try {
+                            $data = simplexml_load_string($data);
+                        } catch (\Exception $e) {
+                            return redirect()->route('welcome')->with('error', 'URL (' . $post . ') is not a valid RSS Feed');
+                        }
+
                         $feed->url = $post;
 
                         $feed->save();
 
-                        $success = true;
+                        if($success = false) {
+                            $success = true;
+                        }
                     }
                 }
             }
         }
 
-        if($success) {
+        if ($success) {
             return redirect()->route('welcome')->with('success', 'URLs successfully updated');
         } else {
             return redirect()->route('welcome')->with('error', 'No URLs to update');
