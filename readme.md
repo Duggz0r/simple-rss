@@ -25,7 +25,7 @@
 
 <p>The app has also been deployed, visit the app at <a href="https://duggz0r-simple-rss.herokuapp.com/" target="_blank">https://duggz0r-simple-rss.herokuapp.com/</a>. SQL Database is hosted online</p>
 
-<h3>Test RSS Feeds<h3>
+<h3>Test RSS Feeds</h3>
 <hr/>
 
 <p><a href="https://www.php.net/news.rss" target="_blank">https://www.php.net/news.rss</a></p>
